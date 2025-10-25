@@ -29,7 +29,7 @@ const generateReminderId = () => {
   return "REM_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9)
 }
 
-// Create reminder - FIXED TIMEZONE HANDLING
+// Create reminder - PROPER TIMEZONE HANDLING
 router.post("/", verifyToken, async (req, res) => {
   try {
     const { name, description, expiryDate, category } = req.body
@@ -38,24 +38,26 @@ router.post("/", verifyToken, async (req, res) => {
       return res.status(400).json({ message: "Name and expiry date are required" })
     }
 
-    // FIX: Use the date directly - datetime-local already provides correct time
-    const reminderExpiryDate = new Date(expiryDate);
+    // FIXED: Proper date handling
+    // The datetime-local input gives us local time without timezone info
+    // We need to treat it as local time and store it properly
+    
+    const localDate = new Date(expiryDate);
     const currentTime = new Date();
 
-    console.log('📅 Date Information:');
-    console.log('   Input expiry date:', expiryDate);
-    console.log('   Parsed expiry date:', reminderExpiryDate);
-    console.log('   Current server time:', currentTime);
-    console.log('   Time difference (ms):', reminderExpiryDate.getTime() - currentTime.getTime());
-    console.log('   Expiry date (ISO):', reminderExpiryDate.toISOString());
-    console.log('   Expiry date (Local):', reminderExpiryDate.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }));
+    console.log('📅 DATE DEBUG INFO:');
+    console.log('   Input from frontend:', expiryDate);
+    console.log('   Parsed as local:', localDate.toString());
+    console.log('   Local ISO:', localDate.toISOString());
+    console.log('   Current server time:', currentTime.toString());
+    console.log('   Time difference (minutes):', (localDate.getTime() - currentTime.getTime()) / (1000 * 60));
 
     const reminder = new Reminder({
       reminderId: generateReminderId(),
       userId: req.userId,
       name,
       description: description || "",
-      expiryDate: reminderExpiryDate, // Store as provided (already in correct time)
+      expiryDate: localDate, // Store as local date
       category: category || "General",
       status: "active",
     })
@@ -66,7 +68,7 @@ router.post("/", verifyToken, async (req, res) => {
     try {
       const user = await User.findById(req.userId)
       if (user && user.phone) {
-        const formattedDate = reminderExpiryDate.toLocaleDateString('en-IN', {
+        const formattedDate = localDate.toLocaleDateString('en-IN', {
           timeZone: 'Asia/Kolkata',
           day: '2-digit',
           month: '2-digit',
@@ -94,20 +96,7 @@ router.get("/", verifyToken, async (req, res) => {
   try {
     const reminders = await Reminder.find({ userId: req.userId }).sort({ createdAt: -1 })
     
-    // Format dates for display in IST
-    const remindersWithDisplay = reminders.map(reminder => ({
-      ...reminder.toObject(),
-      displayDate: reminder.expiryDate.toLocaleString('en-IN', {
-        timeZone: 'Asia/Kolkata',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    }))
-    
-    res.json({ reminders: remindersWithDisplay })
+    res.json({ reminders })
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message })
   }
@@ -121,26 +110,13 @@ router.get("/:id", verifyToken, async (req, res) => {
       return res.status(404).json({ message: "Reminder not found" })
     }
     
-    // Add formatted date for display
-    const reminderWithDisplay = {
-      ...reminder.toObject(),
-      displayDate: reminder.expiryDate.toLocaleString('en-IN', {
-        timeZone: 'Asia/Kolkata',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    }
-    
-    res.json({ reminder: reminderWithDisplay })
+    res.json({ reminder })
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message })
   }
 })
 
-// Update reminder - FIXED TIMEZONE
+// Update reminder
 router.put("/:id", verifyToken, async (req, res) => {
   try {
     const { name, description, expiryDate, category, status } = req.body
@@ -155,12 +131,12 @@ router.put("/:id", verifyToken, async (req, res) => {
 
     // If expiryDate is provided, use it directly
     if (expiryDate) {
-      const reminderExpiryDate = new Date(expiryDate);
-      updateData.expiryDate = reminderExpiryDate;
+      const localDate = new Date(expiryDate);
+      updateData.expiryDate = localDate;
       
-      console.log('📅 Update Date Information:');
-      console.log('   Input expiry date:', expiryDate);
-      console.log('   Parsed expiry date:', reminderExpiryDate);
+      console.log('📅 Update Date:');
+      console.log('   Input:', expiryDate);
+      console.log('   Parsed:', localDate.toString());
     }
 
     const reminder = await Reminder.findOneAndUpdate(
@@ -175,17 +151,7 @@ router.put("/:id", verifyToken, async (req, res) => {
 
     res.json({ 
       message: "Reminder updated successfully", 
-      reminder: {
-        ...reminder.toObject(),
-        displayDate: reminder.expiryDate.toLocaleString('en-IN', {
-          timeZone: 'Asia/Kolkata',
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
-      }
+      reminder
     })
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message })

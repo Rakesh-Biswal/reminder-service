@@ -7,12 +7,13 @@ const setBuzzerFlag = async (status) => {
     await firebaseRef.set({
       status: status,
       updatedAt: new Date().toISOString(),
+      lastUpdated: Date.now()
     })
-    console.log(`Buzzer flag set to: ${status}`)
-    return true
+    console.log(`✅ Firebase: Buzzer flag set to: ${status}`)
+    return { success: true, status }
   } catch (error) {
-    console.error("Error setting buzzer flag:", error)
-    throw error
+    console.error("❌ Firebase: Error setting buzzer flag:", error.message)
+    return { success: false, error: error.message }
   }
 }
 
@@ -23,16 +24,18 @@ const getBuzzerFlag = async () => {
     const snapshot = await firebaseRef.once("value")
 
     if (snapshot.exists()) {
-      return snapshot.val()
+      const data = snapshot.val()
+      console.log(`✅ Firebase: Got buzzer flag: ${data.status}`)
+      return data
     }
+    console.log('ℹ️ Firebase: No buzzer flag found, returning default')
     return { status: "expired" } // Default value
   } catch (error) {
-    console.error("Error getting buzzer flag:", error)
+    console.error("❌ Firebase: Error getting buzzer flag:", error.message)
     throw error
   }
 }
 
-// Remove all existing Firebase functions since we don't store product data anymore
 module.exports = {
   setBuzzerFlag,
   getBuzzerFlag

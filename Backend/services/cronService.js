@@ -5,17 +5,19 @@ const { sendExpiryNotificationSMS } = require('./twilioService');
 const { setBuzzerFlag } = require('./firebaseService');
 
 /**
- * Check for expired reminders and activate buzzer - FIXED TIMEZONE
+ * Check for expired reminders and activate buzzer - FIXED COMPARISON
  */
 const checkExpiredReminders = async () => {
   try {
-    const currentTime = new Date(); // Use server time directly
-    console.log('🔍 Checking for expired reminders...');
-    console.log('⏰ Current server time:', currentTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }));
+    const currentTime = new Date();
     
-    // Find reminders that have expired (compare directly with server time)
+    console.log('🔍 Checking for expired reminders...');
+    console.log('⏰ Current server time:', currentTime.toString());
+    console.log('⏰ Current IST time:', currentTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }));
+    
+    // Find reminders that have expired
     const expiredReminders = await Reminder.find({
-      expiryDate: { $lte: currentTime }, // Compare with current server time
+      expiryDate: { $lte: currentTime },
       status: 'active'
     }).populate('userId');
 
@@ -27,14 +29,16 @@ const checkExpiredReminders = async () => {
     for (const reminder of expiredReminders) {
       try {
         console.log(`   Processing: ${reminder.name}`);
-        console.log(`   Expiry: ${reminder.expiryDate.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
-        console.log(`   Current: ${currentTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
+        console.log(`   Expiry Date: ${reminder.expiryDate.toString()}`);
+        console.log(`   Expiry IST: ${reminder.expiryDate.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
+        console.log(`   Current: ${currentTime.toString()}`);
+        console.log(`   Is expired: ${reminder.expiryDate <= currentTime}`);
         
         // Activate buzzer flag if any reminder is expired
         if (!buzzerActivated) {
+          console.log(`🚨 ACTIVATING BUZZER for: ${reminder.name}`);
           await setBuzzerFlag("active");
           buzzerActivated = true;
-          console.log(`🚨 Buzzer activated for: ${reminder.name}`);
         }
 
         // Send SMS notification
@@ -65,9 +69,11 @@ const checkExpiredReminders = async () => {
       // No expired reminders found, ensure buzzer flag is set to expired
       await setBuzzerFlag("expired");
       console.log('✅ No expired reminders - buzzer flag set to: expired');
+    } else {
+      console.log('🚨 BUZZER WAS ACTIVATED - Firebase flag set to: active');
     }
 
-    console.log(`📊 Cron job completed: ${notifiedCount} notifications sent, buzzer: ${buzzerActivated ? 'ACTIVE' : 'EXPIRED'}`);
+    console.log(`📊 Cron job completed: ${notifiedCount} notifications sent`);
 
   } catch (error) {
     console.error('❌ Error in cron job:', error.message);
