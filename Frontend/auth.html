@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In / Sign Up - ExpiryReminder</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #2563eb;
+      --primary-light: #dbeafe;
+      --secondary-color: #1e293b;
+      --accent-color: #f59e0b;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --bg-light: #f8fafc;
+      --bg-white: #ffffff;
+      --border-color: #e2e8f0;
+      --success-color: #10b981;
+      --danger-color: #ef4444;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: var(--bg-light);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dark);
+      line-height: 1.6;
+    }
+
+    .auth-container {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      width: 100%;
+      max-width: 1100px;
+      height: 680px;
+      background-color: var(--bg-white);
+      border-radius: 1rem;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      animation: slideIn 0.5s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Left Side - Branding & Info */
+    .auth-left {
+      background: linear-gradient(135deg, var(--bg-light) 0%, var(--primary-light) 100%);
+      padding: 3rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-left::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: var(--primary-color);
+      opacity: 0.05;
+      border-radius: 50%;
+      transform: translate(30px, -30px);
+    }
+
+    .auth-left::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 150px;
+      height: 150px;
+      background: var(--accent-color);
+      opacity: 0.05;
+      border-radius: 50%;
+      transform: translate(-50px, 50px);
+    }
+
+    .auth-branding {
+      margin-bottom: 2.5rem;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .logo-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 12px;
+      margin-right: 1rem;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .auth-branding h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+    }
+
+    .auth-branding p {
+      font-size: 1rem;
+      color: var(--text-light);
+      max-width: 500px;
+    }
+
+    .auth-content {
+      margin-bottom: 2rem;
+    }
+
+    .auth-content h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--secondary-color);
+    }
+
+    .auth-content p {
+      margin-bottom: 1.5rem;
+      color: var(--text-light);
+    }
+
+    .benefits-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .benefit-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background-color: var(--primary-light);
+      color: var(--primary-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .benefit-text h3 {
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+      color: var(--secondary-color);
+    }
+
+    .benefit-text p {
+      font-size: 0.9rem;
+      margin-bottom: 0;
+      color: var(--text-light);
+    }
+
+    .testimonial {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      margin-top: 1rem;
+    }
+
+    .testimonial p {
+      font-style: italic;
+      margin-bottom: 1rem;
+      color: var(--text-dark);
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+    }
+
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-weight: bold;
+    }
+
+    .author-info h4 {
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .author-info p {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 0;
+    }
+
+    /* Right Side - Forms */
+    .auth-right {
+      padding: 3rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+    }
+
+    .form-wrapper {
+      opacity: 0;
+      transform: translateX(20px);
+      pointer-events: none;
+      transition: all 0.3s ease;
+      position: absolute;
+      width: 100%;
+    }
+
+    .form-wrapper.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+      position: relative;
+    }
+
+    .form-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .form-header h2 {
+      font-size: 1.75rem;
+      color: var(--secondary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-subtitle {
+      color: var(--text-light);
+      font-size: 0.95rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-dark);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .phone-input {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .phone-input:focus-within {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .country-code {
+      padding: 0.75rem 1rem;
+      background-color: var(--bg-light);
+      border-right: 1px solid var(--border-color);
+      color: var(--text-dark);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .phone-input input {
+      flex: 1;
+      border: none;
+      padding: 0.75rem;
+    }
+
+    .phone-input input:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 0.875rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 0.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-submit:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    .form-toggle {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    .form-toggle a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .form-toggle a:hover {
+      color: var(--secondary-color);
+      text-decoration: underline;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 1.5rem 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .divider span {
+      padding: 0 1rem;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    .message {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      text-align: center;
+      font-size: 0.9rem;
+      display: none;
+      animation: slideDown 0.3s ease;
+    }
+
+    .message.success {
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--success-color);
+      display: block;
+    }
+
+    .message.error {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: var(--danger-color);
+      display: block;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .auth-container {
+        grid-template-columns: 1fr;
+        height: auto;
+        max-width: 100%;
+        border-radius: 0;
+        margin: 1rem;
+      }
+
+      .auth-left {
+        padding: 2rem 1.5rem;
+      }
+
+      .auth-right {
+        padding: 2rem 1.5rem;
+      }
+
+      .form-container {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <!-- Left Side - Branding & Information -->
+    <div class="auth-left">
+      <div>
+        <div class="auth-branding">
+          <div class="logo-container">
+            <div class="logo-icon">
+              <i class="fas fa-hourglass-half"></i>
+            </div>
+            <h1>ExpiryReminder</h1>
+          </div>
+          <p>Streamline your inventory management with automated expiry tracking and real-time notifications.</p>
+        </div>
+
+        <div class="auth-content">
+          <h2>Why Choose ExpiryReminder?</h2>
+          <p>Our platform helps businesses and individuals efficiently manage product expiration dates, reduce waste, and save money.</p>
+          
+          <div class="benefits-list">
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <i class="fas fa-bell"></i>
+              </div>
+              <div class="benefit-text">
+                <h3>Smart Notifications</h3>
+                <p>Get alerts before products expire via email, SMS, or push notifications.</p>
+              </div>
+            </div>
+            
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div class="benefit-text">
+                <h3>Analytics & Reports</h3>
+                <p>Track expiry patterns and generate reports to optimize your inventory.</p>
+              </div>
+            </div>
+            
+            <div class="benefit-item">
+              <div class="benefit-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <div class="benefit-text">
+                <h3>Secure & Compliant</h3>
+                <p>Enterprise-grade security with compliance for regulated industries.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial">
+        <p>"ExpiryReminder has saved our pharmacy thousands of dollars by preventing expired medication waste. The automated alerts are a game-changer."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">SR</div>
+          <div class="author-info">
+            <h4>Sarah Rodriguez</h4>
+            <p>Pharmacy Manager, MedCare Solutions</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side - Forms -->
+    <div class="auth-right">
+      <div class="form-container">
+        <!-- Signin Form -->
+        <div class="form-wrapper active" id="signin-form">
+          <div class="form-header">
+            <h2>Welcome Back</h2>
+            <p class="form-subtitle">Sign in to your ExpiryReminder account</p>
+          </div>
+          
+          <form id="signin-form-element">
+            <div class="form-group">
+              <label for="signin-email">Email Address</label>
+              <input type="email" id="signin-email" placeholder="you@example.com" required>
+            </div>
+
+            <div class="form-group">
+              <label for="signin-password">Password</label>
+              <input type="password" id="signin-password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-submit">Sign In</button>
+          </form>
+
+          <div class="divider"><span>OR</span></div>
+
+          <p class="form-toggle">
+            Don't have an account? <a href="#" onclick="toggleForms()">Create Account</a>
+          </p>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="form-wrapper" id="signup-form">
+          <div class="form-header">
+            <h2>Create Account</h2>
+            <p class="form-subtitle">Join thousands of businesses using ExpiryReminder</p>
+          </div>
+          
+          <form id="signup-form-element">
+            <div class="form-group">
+              <label for="signup-name">Full Name</label>
+              <input type="text" id="signup-name" placeholder="John Doe" required>
+            </div>
+
+            <div class="form-group">
+              <label for="signup-email">Email Address</label>
+              <input type="email" id="signup-email" placeholder="you@example.com" required>
+            </div>
+
+            <div class="form-group">
+              <label for="signup-password">Password</label>
+              <input type="password" id="signup-password" placeholder="••••••••" required>
+            </div>
+
+            <div class="form-group">
+              <label for="signup-phone">Phone Number</label>
+              <div class="phone-input">
+                <span class="country-code">+91</span>
+                <input type="tel" id="signup-phone" placeholder="9876543210">
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Create Account</button>
+          </form>
+
+          <div class="divider"><span>OR</span></div>
+
+          <p class="form-toggle">
+            Already have an account? <a href="#" onclick="toggleForms()">Sign In</a>
+          </p>
+        </div>
+
+        <!-- Message Display -->
+        <div id="message" class="message"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:5000/api"
+
+    // Toggle between signin and signup forms
+    function toggleForms() {
+      const signinForm = document.getElementById("signin-form")
+      const signupForm = document.getElementById("signup-form")
+
+      signinForm.classList.toggle("active")
+      signupForm.classList.toggle("active")
+
+      // Clear forms
+      document.getElementById("signin-form-element").reset()
+      document.getElementById("signup-form-element").reset()
+      document.getElementById("message").textContent = ""
+      document.getElementById("message").className = "message"
+    }
+
+    // Show message
+    function showMessage(message, type) {
+      const messageEl = document.getElementById("message")
+      messageEl.textContent = message
+      messageEl.className = `message ${type}`
+
+      setTimeout(() => {
+        messageEl.className = "message"
+      }, 5000)
+    }
+
+    // Signin form submission
+    document.getElementById("signin-form-element").addEventListener("submit", async (e) => {
+      e.preventDefault()
+
+      const email = document.getElementById("signin-email").value
+      const password = document.getElementById("signin-password").value
+
+      try {
+        const response = await fetch(`${API_URL}/auth/signin`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        })
+
+        const data = await response.json()
+
+        if (response.ok) {
+          // Store JWT token in cookie
+          document.cookie = `token=${data.token}; path=/; max-age=604800`
+          showMessage("Sign in successful! Redirecting...", "success")
+
+          setTimeout(() => {
+            window.location.href = "dashboard.html"
+          }, 1500)
+        } else {
+          showMessage(data.message || "Sign in failed", "error")
+        }
+      } catch (error) {
+        showMessage("Error: " + error.message, "error")
+      }
+    })
+
+    // Signup form submission
+    document.getElementById("signup-form-element").addEventListener("submit", async (e) => {
+      e.preventDefault()
+
+      const name = document.getElementById("signup-name").value
+      const email = document.getElementById("signup-email").value
+      const password = document.getElementById("signup-password").value
+      const phone = "+91" + document.getElementById("signup-phone").value
+
+      try {
+        const response = await fetch(`${API_URL}/auth/signup`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, password, phone }),
+        })
+
+        const data = await response.json()
+
+        if (response.ok) {
+          // Store JWT token in cookie
+          document.cookie = `token=${data.token}; path=/; max-age=604800`
+          showMessage("Account created successfully! Redirecting...", "success")
+
+          setTimeout(() => {
+            window.location.href = "dashboard.html"
+          }, 1500)
+        } else {
+          showMessage(data.message || "Sign up failed", "error")
+        }
+      } catch (error) {
+        showMessage("Error: " + error.message, "error")
+      }
+    })
+  </script>
+</body>
+</html>

@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - ExpiryReminder</title>
+  <style>
+    /* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f8f9fa;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* Dashboard Layout */
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background-color: #2c3e50;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid #34495e;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-small {
+      font-size: 24px;
+      margin-right: 10px;
+    }
+
+    .logo-text {
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 0;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: #bdc3c7;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav-item:hover {
+      background-color: #34495e;
+      color: white;
+    }
+
+    .nav-item.active {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .nav-icon {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid #34495e;
+    }
+
+    .btn-logout {
+      width: 100%;
+      padding: 10px;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-logout:hover {
+      background-color: #c0392b;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: white;
+      padding: 15px 30px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-left h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+      background-color: #3498db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .user-email {
+      font-size: 12px;
+      color: #7f8c8d;
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .section-header h2 {
+      font-size: 24px;
+      color: #2c3e50;
+    }
+
+    .btn-new-reminder {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.3s;
+    }
+
+    .btn-new-reminder:hover {
+      background-color: #2980b9;
+    }
+
+    /* Overview Grid */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+    }
+
+    .stat-icon {
+      font-size: 24px;
+      margin-right: 15px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f8f9fa;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #7f8c8d;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    /* Chart Section */
+    .chart-section {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .chart-section h3 {
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+
+    .chart-container {
+      height: 300px;
+      position: relative;
+    }
+
+    /* Recent Section */
+    .recent-section {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .recent-section h3 {
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+
+    /* History Section */
+    .history-filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      background-color: #ecf0f1;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .filter-btn.active {
+      background-color: #3498db;
+      color: white;
+    }
+
+    /* Reminders List */
+    .reminders-list {
+      display: grid;
+      gap: 15px;
+    }
+
+    .reminder-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid #3498db;
+    }
+
+    .reminder-card.expired {
+      border-left-color: #e74c3c;
+    }
+
+    .reminder-card.about-to-expire {
+      border-left-color: #f39c12;
+    }
+
+    .reminder-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .reminder-title {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .reminder-status {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .reminder-status.active {
+      background-color: #d5edff;
+      color: #3498db;
+    }
+
+    .reminder-status.expired {
+      background-color: #ffeaea;
+      color: #e74c3c;
+    }
+
+    .reminder-status.about-to-expire {
+      background-color: #fff4e0;
+      color: #f39c12;
+    }
+
+    .reminder-description {
+      color: #7f8c8d;
+      margin-bottom: 10px;
+    }
+
+    .reminder-date {
+      font-size: 14px;
+      color: #7f8c8d;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #7f8c8d;
+      padding: 40px;
+      background-color: white;
+      border-radius: 8px;
+    }
+
+    /* Settings Section */
+    .settings-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .settings-card h3 {
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+
+    .setting-item {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #ecf0f1;
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .setting-item label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #2c3e50;
+    }
+
+    .setting-item p {
+      color: #7f8c8d;
+    }
+
+    .setting-item input[type="checkbox"] {
+      margin-right: 8px;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background-color: white;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #ecf0f1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      color: #2c3e50;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #7f8c8d;
+    }
+
+    .modal-form {
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #2c3e50;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-cancel {
+      padding: 10px 20px;
+      background-color: #ecf0f1;
+      color: #7f8c8d;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-create {
+      padding: 10px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Add to existing CSS */
+    .reminder-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-edit,
+    .btn-delete {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 4px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    .btn-edit:hover {
+      background-color: rgba(52, 152, 219, 0.1);
+    }
+
+    .btn-delete:hover {
+      background-color: rgba(231, 76, 60, 0.1);
+    }
+
+    /* Spinner Styles */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, .3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .btn-loading {
+      position: relative;
+      color: transparent !important;
+    }
+
+    .btn-loading::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, .3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .dashboard-container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+      }
+
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-small">⏰</div>
+        <span class="logo-text">ExpiryReminder</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-section="overview">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Overview</span>
+        </a>
+        <a href="#" class="nav-item" data-section="history">
+          <span class="nav-icon">📜</span>
+          <span class="nav-text">History</span>
+        </a>
+        <a href="#" class="nav-item" data-section="settings">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn-logout" onclick="logout()">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Navbar -->
+      <nav class="navbar">
+        <div class="navbar-left">
+          <h1 id="page-title">Overview</h1>
+        </div>
+        <div class="navbar-right">
+          <div class="user-profile">
+            <div class="avatar" id="user-avatar">U</div>
+            <div class="user-info">
+              <p class="user-name" id="user-name">Loading...</p>
+              <p class="user-email" id="user-email">Loading...</p>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Content Area -->
+      <div class="content-area">
+        <!-- Overview Section -->
+        <section id="overview" class="section active">
+          <div class="section-header">
+            <h2>Your Reminders</h2>
+            <button class="btn-new-reminder" onclick="openReminderModal()">+ New Reminder</button>
+          </div>
+
+          <div class="overview-grid">
+            <div class="stat-card">
+              <div class="stat-icon">📦</div>
+              <div class="stat-content">
+                <p class="stat-label">Total Reminders</p>
+                <p class="stat-value" id="total-reminders">0</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">⚠️</div>
+              <div class="stat-content">
+                <p class="stat-label">About to Expire</p>
+                <p class="stat-value" id="about-to-expire">0</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">✅</div>
+              <div class="stat-content">
+                <p class="stat-label">Active</p>
+                <p class="stat-value" id="active-reminders">0</p>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">❌</div>
+              <div class="stat-content">
+                <p class="stat-label">Expired</p>
+                <p class="stat-value" id="expired-reminders">0</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart Section -->
+          <div class="chart-section">
+            <h3>Expiry Timeline</h3>
+            <div id="chart-container" class="chart-container">
+              <canvas id="expiryChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Recent Reminders -->
+          <div class="recent-section">
+            <h3>Recent Reminders</h3>
+            <div id="recent-reminders" class="reminders-list">
+              <p class="empty-state">No reminders yet. Create one to get started!</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- History Section -->
+        <section id="history" class="section">
+          <div class="section-header">
+            <h2>Reminder History</h2>
+            <button class="btn-new-reminder" onclick="openReminderModal()">+ New Reminder</button>
+          </div>
+
+          <div class="history-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="active">Active</button>
+            <button class="filter-btn" data-filter="expired">Expired</button>
+            <button class="filter-btn" data-filter="about-to-expire">About to Expire</button>
+          </div>
+
+          <div id="history-reminders" class="reminders-list">
+            <p class="empty-state">No reminders found.</p>
+          </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings" class="section">
+          <div class="section-header">
+            <h2>Settings</h2>
+          </div>
+
+          <div class="settings-card">
+            <h3>Account Information</h3>
+            <div class="setting-item">
+              <label>Name</label>
+              <p id="setting-name">Loading...</p>
+            </div>
+            <div class="setting-item">
+              <label>Email</label>
+              <p id="setting-email">Loading...</p>
+            </div>
+            <div class="setting-item">
+              <label>Phone</label>
+              <p id="setting-phone">Loading...</p>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <h3>Preferences</h3>
+            <div class="setting-item">
+              <label>
+                <input type="checkbox" id="notification-enabled" checked>
+                Enable Notifications
+              </label>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Reminder Modal -->
+  <div id="reminder-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title">Create New Reminder</h2>
+        <button class="modal-close" onclick="closeReminderModal()">&times;</button>
+      </div>
+
+      <form id="reminder-form" class="modal-form">
+        <div class="form-group">
+          <label for="reminder-name">Reminder Name *</label>
+          <input type="text" id="reminder-name" placeholder="e.g., Milk Expiry" required>
+        </div>
+
+        <div class="form-group">
+          <label for="reminder-description">Description</label>
+          <textarea id="reminder-description" placeholder="Add any notes..." rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="reminder-date">Expiry Date & Time *</label>
+          <input type="datetime-local" id="reminder-date" required>
+        </div>
+
+        <div class="form-group">
+          <label for="reminder-category">Category</label>
+          <select id="reminder-category">
+            <option value="General">General</option>
+            <option value="Food">Food</option>
+            <option value="Medicine">Medicine</option>
+            <option value="Cosmetics">Cosmetics</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeReminderModal()">Cancel</button>
+          <button type="submit" class="btn-create" id="modal-submit-btn">
+            Create Reminder
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const API_URL = "http://localhost:5000/api"
+    let currentFilter = "all"
+    let allReminders = []
+    let expiryChart = null
+    let currentEditingId = null;
+    let isEditMode = false;
+
+    // Get token from cookie
+    function getToken() {
+      const name = "token="
+      const decodedCookie = decodeURIComponent(document.cookie)
+      const cookieArray = decodedCookie.split(";")
+
+      for (let cookie of cookieArray) {
+        cookie = cookie.trim()
+        if (cookie.indexOf(name) === 0) {
+          return cookie.substring(name.length)
+        }
+      }
+      return null
+    }
+
+    // Check authentication
+    function checkAuth() {
+      const token = getToken()
+      if (!token) {
+        window.location.href = "auth.html"
+      }
+    }
+
+    // Load user profile
+    async function loadUserProfile() {
+      try {
+        const token = getToken()
+        const response = await fetch(`${API_URL}/auth/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          const user = data.user
+
+          document.getElementById("user-name").textContent = user.name
+          document.getElementById("user-email").textContent = user.email
+          document.getElementById("user-avatar").textContent = user.name.charAt(0).toUpperCase()
+
+          document.getElementById("setting-name").textContent = user.name
+          document.getElementById("setting-email").textContent = user.email
+          document.getElementById("setting-phone").textContent = user.phone || "Not provided"
+        }
+      } catch (error) {
+        console.error("Error loading profile:", error)
+      }
+    }
+
+    // Load reminders
+    async function loadReminders() {
+      try {
+        const token = getToken()
+        const response = await fetch(`${API_URL}/reminders`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          allReminders = data.reminders
+          updateStats()
+          displayReminders()
+          updateChart()
+        }
+      } catch (error) {
+        console.error("Error loading reminders:", error)
+      }
+    }
+
+    // Update statistics
+    function updateStats() {
+      const now = new Date()
+      const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+
+      let total = 0
+      let active = 0
+      let expired = 0
+      let aboutToExpire = 0
+
+      allReminders.forEach((reminder) => {
+        const expiryDate = new Date(reminder.expiryDate)
+        total++
+
+        if (expiryDate < now) {
+          expired++
+        } else if (expiryDate <= sevenDaysFromNow) {
+          aboutToExpire++
+        } else {
+          active++
+        }
+      })
+
+      document.getElementById("total-reminders").textContent = total
+      document.getElementById("active-reminders").textContent = active
+      document.getElementById("expired-reminders").textContent = expired
+      document.getElementById("about-to-expire").textContent = aboutToExpire
+    }
+
+    // Display reminders
+    function displayReminders() {
+      const now = new Date()
+      const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+
+      let filtered = allReminders
+
+      if (currentFilter !== "all") {
+        filtered = allReminders.filter((reminder) => {
+          const expiryDate = new Date(reminder.expiryDate)
+
+          if (currentFilter === "active") {
+            return expiryDate > sevenDaysFromNow
+          } else if (currentFilter === "expired") {
+            return expiryDate < now
+          } else if (currentFilter === "about-to-expire") {
+            return expiryDate >= now && expiryDate <= sevenDaysFromNow
+          }
+          return true
+        })
+      }
+
+      const recentContainer = document.getElementById("recent-reminders")
+      const historyContainer = document.getElementById("history-reminders")
+
+      if (filtered.length === 0) {
+        const emptyMsg = '<p class="empty-state">No reminders found.</p>'
+        recentContainer.innerHTML = emptyMsg
+        historyContainer.innerHTML = emptyMsg
+        return
+      }
+
+      const reminderHTML = filtered
+        .map((reminder) => {
+          const expiryDate = new Date(reminder.expiryDate)
+          const now = new Date()
+          const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+
+          let status = "active"
+          let statusClass = "active"
+
+          if (expiryDate < now) {
+            status = "Expired"
+            statusClass = "expired"
+          } else if (expiryDate <= sevenDaysFromNow) {
+            status = "About to Expire"
+            statusClass = "about-to-expire"
+          } else {
+            status = "Active"
+            statusClass = "active"
+          }
+
+          return `
+        <div class="reminder-card ${statusClass}">
+          <div class="reminder-header">
+            <div class="reminder-title">${reminder.name}</div>
+            <div class="reminder-actions">
+              <button class="btn-edit" onclick="editReminder('${reminder.reminderId}')" title="Edit">
+                ✏️
+              </button>
+              <button class="btn-delete" onclick="deleteReminder('${reminder.reminderId}')" title="Delete">
+                🗑️
+              </button>
+              <span class="reminder-status ${statusClass}">${status}</span>
+            </div>
+          </div>
+          ${reminder.description ? `<p class="reminder-description">${reminder.description}</p>` : ""}
+          <p class="reminder-date">Expires: ${expiryDate.toLocaleDateString()} ${expiryDate.toLocaleTimeString()}</p>
+        </div>
+    `
+        })
+        .join("")
+
+      recentContainer.innerHTML = reminderHTML
+      historyContainer.innerHTML = reminderHTML
+    }
+
+    // Update chart
+    function updateChart() {
+      const ctx = document.getElementById("expiryChart")
+      if (!ctx) return
+
+      // Destroy existing chart if it exists
+      if (expiryChart) {
+        expiryChart.destroy()
+      }
+
+      const now = new Date()
+      const labels = []
+      const data = []
+
+      // Generate labels and data for the next 7 days
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(now)
+        date.setDate(date.getDate() + i)
+        labels.push(date.toLocaleDateString("en-US", { month: "short", day: "numeric" }))
+
+        const count = allReminders.filter((reminder) => {
+          const expiryDate = new Date(reminder.expiryDate)
+          return expiryDate.toDateString() === date.toDateString()
+        }).length
+
+        data.push(count)
+      }
+
+      // Create new chart
+      expiryChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Expiring Products",
+              data: data,
+              backgroundColor: "rgba(37, 99, 235, 0.8)",
+              borderColor: "rgba(37, 99, 235, 1)",
+              borderRadius: 5,
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1,
+              },
+            },
+          },
+        },
+      })
+    }
+
+    // Open reminder modal
+    function openReminderModal(reminderId = null) {
+      const modal = document.getElementById("reminder-modal");
+      const title = document.getElementById("modal-title");
+      const submitBtn = document.getElementById("modal-submit-btn");
+
+      if (reminderId) {
+        // Edit mode
+        isEditMode = true;
+        currentEditingId = reminderId;
+        title.textContent = "Edit Reminder";
+        submitBtn.textContent = "Update Reminder";
+
+        // Load reminder data
+        loadReminderData(reminderId);
+      } else {
+        // Create mode
+        isEditMode = false;
+        currentEditingId = null;
+        title.textContent = "Create New Reminder";
+        submitBtn.textContent = "Create Reminder";
+        document.getElementById("reminder-form").reset();
+      }
+
+      modal.classList.add("active");
+    }
+
+    async function loadReminderData(reminderId) {
+      try {
+        showSpinner();
+        const token = getToken();
+        const response = await fetch(`${API_URL}/reminders/${reminderId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const reminder = data.reminder;
+
+          // Populate form fields
+          document.getElementById("reminder-name").value = reminder.name;
+          document.getElementById("reminder-description").value = reminder.description || "";
+
+          // Format date for datetime-local input
+          const expiryDate = new Date(reminder.expiryDate);
+          const formattedDate = expiryDate.toISOString().slice(0, 16);
+          document.getElementById("reminder-date").value = formattedDate;
+
+          document.getElementById("reminder-category").value = reminder.category || "General";
+        }
+      } catch (error) {
+        console.error("Error loading reminder:", error);
+        alert("Failed to load reminder data");
+      } finally {
+        hideSpinner();
+      }
+    }
+
+    // Close reminder modal
+    function closeReminderModal() {
+      document.getElementById("reminder-modal").classList.remove("active");
+      document.getElementById("reminder-form").reset();
+      isEditMode = false;
+      currentEditingId = null;
+    }
+
+    // Spinner functions
+    function showSpinner() {
+      document.getElementById("loading-spinner").style.display = "flex";
+    }
+
+    function hideSpinner() {
+      document.getElementById("loading-spinner").style.display = "none";
+    }
+
+    function setButtonLoading(button, isLoading) {
+      if (isLoading) {
+        button.disabled = true;
+        button.classList.add("btn-loading");
+      } else {
+        button.disabled = false;
+        button.classList.remove("btn-loading");
+      }
+    }
+
+    function initializeFirebaseSync() {
+      const syncStatus = document.createElement("div")
+      syncStatus.id = "firebase-sync-status"
+      syncStatus.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background-color: #10b981;
+    color: white;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    display: none;
+    z-index: 999;
+  `
+      syncStatus.textContent = "✓ Firebase Synced"
+      document.body.appendChild(syncStatus)
+    }
+
+    // Show sync status
+    function showSyncStatus() {
+      const status = document.getElementById("firebase-sync-status")
+      if (status) {
+        status.style.display = "block"
+        setTimeout(() => {
+          status.style.display = "none"
+        }, 3000)
+      }
+    }
+
+    // Form submission handler
+    document.getElementById("reminder-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("reminder-name").value;
+      const description = document.getElementById("reminder-description").value;
+      const expiryDate = document.getElementById("reminder-date").value;
+      const category = document.getElementById("reminder-category").value;
+
+      try {
+        showSpinner();
+        const token = getToken();
+
+        let url = `${API_URL}/reminders`;
+        let method = "POST";
+
+        if (isEditMode && currentEditingId) {
+          url = `${API_URL}/reminders/${currentEditingId}`;
+          method = "PUT";
+        }
+
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name,
+            description,
+            expiryDate,
+            category,
+          }),
+        });
+
+        if (response.ok) {
+          closeReminderModal();
+          showSyncStatus();
+          await loadReminders();
+        } else {
+          console.error("Failed to save reminder:", response.statusText);
+          alert("Failed to save reminder");
+        }
+      } catch (error) {
+        console.error("Error saving reminder:", error);
+        alert("Error saving reminder");
+      } finally {
+        hideSpinner();
+      }
+    });
+
+    async function editReminder(reminderId) {
+      openReminderModal(reminderId);
+    }
+
+
+    async function deleteReminder(reminderId) {
+      if (!confirm("Are you sure you want to delete this reminder?")) {
+        return;
+      }
+
+      try {
+        showSpinner();
+        const token = getToken();
+        const response = await fetch(`${API_URL}/reminders/${reminderId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          showSyncStatus();
+          await loadReminders();
+        } else {
+          console.error("Failed to delete reminder:", response.statusText);
+          alert("Failed to delete reminder");
+        }
+      } catch (error) {
+        console.error("Error deleting reminder:", error);
+        alert("Error deleting reminder");
+      } finally {
+        hideSpinner();
+      }
+    }
+
+
+    // Filter reminders
+    document.querySelectorAll(".filter-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active"))
+        e.target.classList.add("active")
+        currentFilter = e.target.dataset.filter
+        displayReminders()
+      })
+    })
+
+    // Navigation
+    document.querySelectorAll(".nav-item").forEach((item) => {
+      item.addEventListener("click", (e) => {
+        e.preventDefault()
+        const section = item.dataset.section
+
+        document.querySelectorAll(".nav-item").forEach((i) => i.classList.remove("active"))
+        item.classList.add("active")
+
+        document.querySelectorAll(".section").forEach((s) => s.classList.remove("active"))
+        document.getElementById(section).classList.add("active")
+
+        document.getElementById("page-title").textContent = section.charAt(0).toUpperCase() + section.slice(1)
+      })
+    })
+
+    // Logout
+    function logout() {
+      document.cookie = "token=; path=/; max-age=0"
+      window.location.href = "index.html"
+    }
+
+    // Close modal on outside click
+    document.getElementById("reminder-modal").addEventListener("click", (e) => {
+      if (e.target.id === "reminder-modal") {
+        closeReminderModal()
+      }
+    })
+
+    // Initialize
+    checkAuth()
+    loadUserProfile()
+    loadReminders()
+
+    // Initialize Firebase sync on page load
+    initializeFirebaseSync()
+
+    // Refresh reminders every 30 seconds
+    setInterval(loadReminders, 30000)
+  </script>
+
+  <!-- Add this before the closing body tag -->
+  <div id="loading-spinner" class="modal" style="display: none;">
+    <div class="modal-content" style="text-align: center; padding: 40px;">
+      <div class="spinner" style="margin: 0 auto 20px;"></div>
+      <p>Processing...</p>
+    </div>
+  </div>
+
+
+
+</body>
+
+</html>
