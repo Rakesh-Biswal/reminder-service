@@ -4,25 +4,37 @@ const User = require('../models/User');
 const { sendExpiryNotificationSMS } = require('./twilioService');
 const { setBuzzerFlag } = require('./firebaseService');
 
+// Get current IST time
+const getCurrentIST = () => {
+  const now = new Date();
+  const istTime = new Date(now.getTime() + (5 * 60 * 60 * 1000) + (30 * 60 * 1000));
+  return istTime;
+};
+
 /**
- * Check for expired reminders and activate buzzer
+ * Check for expired reminders and activate buzzer - USING IST
  */
 const checkExpiredReminders = async () => {
   try {
+    const currentIST = getCurrentIST();
     console.log('🔍 Checking for expired reminders...');
-    const now = new Date();
+    console.log('⏰ Current IST time:', currentIST.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }));
     
-    // Find reminders that have expired but are still active
+    // Find reminders that have expired in IST timezone
     const expiredReminders = await Reminder.find({
-      expiryDate: { $lte: now },
+      expiryDate: { $lte: currentIST }, // Compare with current IST time
       status: 'active'
     }).populate('userId');
 
     let buzzerActivated = false;
     let notifiedCount = 0;
 
+    console.log(`📊 Found ${expiredReminders.length} expired reminders`);
+
     for (const reminder of expiredReminders) {
       try {
+        console.log(`   Processing: ${reminder.name} | Expiry: ${reminder.expiryDate.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
+        
         // Activate buzzer flag if any reminder is expired
         if (!buzzerActivated) {
           await setBuzzerFlag("active");
@@ -32,7 +44,9 @@ const checkExpiredReminders = async () => {
 
         // Send SMS notification
         if (reminder.userId && reminder.userId.phone) {
-          const formattedDate = reminder.expiryDate.toLocaleDateString();
+          const formattedDate = reminder.expiryDate.toLocaleDateString('en-IN', {
+            timeZone: 'Asia/Kolkata'
+          });
           await sendExpiryNotificationSMS(
             reminder.userId.phone, 
             reminder.name, 
@@ -55,6 +69,7 @@ const checkExpiredReminders = async () => {
     if (!buzzerActivated) {
       // No expired reminders found, ensure buzzer flag is set to expired
       await setBuzzerFlag("expired");
+      console.log('✅ No expired reminders - buzzer flag set to: expired');
     }
 
     console.log(`📊 Cron job completed: ${notifiedCount} notifications sent, buzzer: ${buzzerActivated ? 'ACTIVE' : 'EXPIRED'}`);
@@ -72,7 +87,7 @@ const initializeCronJobs = () => {
   cron.schedule('* * * * *', checkExpiredReminders);
 
   console.log('⏰ Cron jobs initialized:');
-  console.log('   - Expired reminders check: every 1 minute');
+  console.log('   - Expired reminders check: every 1 minute (IST Timezone)');
 
   // Initialize buzzer flag to expired on startup
   setTimeout(async () => {
