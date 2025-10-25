@@ -940,6 +940,7 @@
         return
       }
 
+      // In displayReminders function, replace the date display part:
       const reminderHTML = filtered
         .map((reminder) => {
           const expiryDate = new Date(reminder.expiryDate)
@@ -960,23 +961,33 @@
             statusClass = "active"
           }
 
+          // Format date for display in IST
+          const displayDate = expiryDate.toLocaleString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+
           return `
-        <div class="reminder-card ${statusClass}">
-          <div class="reminder-header">
-            <div class="reminder-title">${reminder.name}</div>
-            <div class="reminder-actions">
-              <button class="btn-edit" onclick="editReminder('${reminder.reminderId}')" title="Edit">
-                ✏️
-              </button>
-              <button class="btn-delete" onclick="deleteReminder('${reminder.reminderId}')" title="Delete">
-                🗑️
-              </button>
-              <span class="reminder-status ${statusClass}">${status}</span>
-            </div>
+      <div class="reminder-card ${statusClass}">
+        <div class="reminder-header">
+          <div class="reminder-title">${reminder.name}</div>
+          <div class="reminder-actions">
+            <button class="btn-edit" onclick="editReminder('${reminder.reminderId}')" title="Edit">
+              ✏️
+            </button>
+            <button class="btn-delete" onclick="deleteReminder('${reminder.reminderId}')" title="Delete">
+              🗑️
+            </button>
+            <span class="reminder-status ${statusClass}">${status}</span>
           </div>
-          ${reminder.description ? `<p class="reminder-description">${reminder.description}</p>` : ""}
-          <p class="reminder-date">Expires: ${expiryDate.toLocaleDateString()} ${expiryDate.toLocaleTimeString()}</p>
         </div>
+        ${reminder.description ? `<p class="reminder-description">${reminder.description}</p>` : ""}
+        <p class="reminder-date">Expires: ${displayDate}</p>
+      </div>
     `
         })
         .join("")

@@ -4,25 +4,18 @@ const User = require('../models/User');
 const { sendExpiryNotificationSMS } = require('./twilioService');
 const { setBuzzerFlag } = require('./firebaseService');
 
-// Get current IST time
-const getCurrentIST = () => {
-  const now = new Date();
-  const istTime = new Date(now.getTime() + (5 * 60 * 60 * 1000) + (30 * 60 * 1000));
-  return istTime;
-};
-
 /**
- * Check for expired reminders and activate buzzer - USING IST
+ * Check for expired reminders and activate buzzer - FIXED TIMEZONE
  */
 const checkExpiredReminders = async () => {
   try {
-    const currentIST = getCurrentIST();
+    const currentTime = new Date(); // Use server time directly
     console.log('🔍 Checking for expired reminders...');
-    console.log('⏰ Current IST time:', currentIST.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }));
+    console.log('⏰ Current server time:', currentTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }));
     
-    // Find reminders that have expired in IST timezone
+    // Find reminders that have expired (compare directly with server time)
     const expiredReminders = await Reminder.find({
-      expiryDate: { $lte: currentIST }, // Compare with current IST time
+      expiryDate: { $lte: currentTime }, // Compare with current server time
       status: 'active'
     }).populate('userId');
 
@@ -33,7 +26,9 @@ const checkExpiredReminders = async () => {
 
     for (const reminder of expiredReminders) {
       try {
-        console.log(`   Processing: ${reminder.name} | Expiry: ${reminder.expiryDate.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
+        console.log(`   Processing: ${reminder.name}`);
+        console.log(`   Expiry: ${reminder.expiryDate.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
+        console.log(`   Current: ${currentTime.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
         
         // Activate buzzer flag if any reminder is expired
         if (!buzzerActivated) {
@@ -87,7 +82,7 @@ const initializeCronJobs = () => {
   cron.schedule('* * * * *', checkExpiredReminders);
 
   console.log('⏰ Cron jobs initialized:');
-  console.log('   - Expired reminders check: every 1 minute (IST Timezone)');
+  console.log('   - Expired reminders check: every 1 minute');
 
   // Initialize buzzer flag to expired on startup
   setTimeout(async () => {
