@@ -910,6 +910,7 @@
 
     // Display reminders
     // Display reminders - FIXED TIMEZONE
+    // Display reminders - FIXED TIMEZONE DISPLAY
     function displayReminders() {
       const now = new Date()
       const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
@@ -961,24 +962,21 @@
             statusClass = "active"
           }
 
-          // FIXED: Format date correctly for IST display
-          // The date is stored in UTC, so we need to adjust for IST (UTC+5:30)
-          const istExpiryDate = new Date(expiryDate.getTime() + (5 * 60 * 60 * 1000) + (30 * 60 * 1000));
-
-          const displayDate = istExpiryDate.toLocaleString('en-IN', {
+          // FIXED: Simple date formatting - use the date as is
+          const displayDate = expiryDate.toLocaleString('en-IN', {
             timeZone: 'Asia/Kolkata',
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
             hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
+            minute: '2-digit'
           });
 
           // Debug info
-          console.log('Reminder:', reminder.name);
-          console.log('  UTC Date:', expiryDate.toISOString());
-          console.log('  IST Date:', displayDate);
+          console.log('Reminder Display:', reminder.name);
+          console.log('  Raw Date:', reminder.expiryDate);
+          console.log('  JS Date:', expiryDate);
+          console.log('  Display Date:', displayDate);
           console.log('  Status:', status);
 
           return `
