@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api"
+const API_URL = "https://reminder-service-e8n7.onrender.com/api"
 
 // Toggle between signin and signup forms
 function toggleForms() {
