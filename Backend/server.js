@@ -11,7 +11,7 @@ const app = express();
 // ✅ CORS Configuration
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://expired-alert-1.vercel.app",
+  "https://reminder-service-gray.vercel.app",
 ];
 
 app.use(
