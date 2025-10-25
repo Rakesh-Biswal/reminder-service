@@ -909,6 +909,7 @@
     }
 
     // Display reminders
+    // Display reminders - FIXED TIMEZONE
     function displayReminders() {
       const now = new Date()
       const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
@@ -940,7 +941,6 @@
         return
       }
 
-      // In displayReminders function, replace the date display part:
       const reminderHTML = filtered
         .map((reminder) => {
           const expiryDate = new Date(reminder.expiryDate)
@@ -961,15 +961,25 @@
             statusClass = "active"
           }
 
-          // Format date for display in IST
-          const displayDate = expiryDate.toLocaleString('en-IN', {
+          // FIXED: Format date correctly for IST display
+          // The date is stored in UTC, so we need to adjust for IST (UTC+5:30)
+          const istExpiryDate = new Date(expiryDate.getTime() + (5 * 60 * 60 * 1000) + (30 * 60 * 1000));
+
+          const displayDate = istExpiryDate.toLocaleString('en-IN', {
             timeZone: 'Asia/Kolkata',
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            hour12: false
           });
+
+          // Debug info
+          console.log('Reminder:', reminder.name);
+          console.log('  UTC Date:', expiryDate.toISOString());
+          console.log('  IST Date:', displayDate);
+          console.log('  Status:', status);
 
           return `
       <div class="reminder-card ${statusClass}">
@@ -1106,12 +1116,19 @@
           document.getElementById("reminder-name").value = reminder.name;
           document.getElementById("reminder-description").value = reminder.description || "";
 
-          // Format date for datetime-local input
+          // FIXED: Format date for datetime-local input (convert from UTC to local)
           const expiryDate = new Date(reminder.expiryDate);
-          const formattedDate = expiryDate.toISOString().slice(0, 16);
-          document.getElementById("reminder-date").value = formattedDate;
 
+          // Adjust for timezone offset to get the correct local time
+          const localExpiryDate = new Date(expiryDate.getTime() - (expiryDate.getTimezoneOffset() * 60000));
+          const formattedDate = localExpiryDate.toISOString().slice(0, 16);
+
+          document.getElementById("reminder-date").value = formattedDate;
           document.getElementById("reminder-category").value = reminder.category || "General";
+
+          console.log('Editing reminder:');
+          console.log('  Original UTC:', reminder.expiryDate);
+          console.log('  Local time:', formattedDate);
         }
       } catch (error) {
         console.error("Error loading reminder:", error);
