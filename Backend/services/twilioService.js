@@ -2,8 +2,8 @@ const twilio = require('twilio');
 
 // Initialize Twilio client
 const client = twilio(
-  'AC4dd1421fbac00d5cc9843f5c28664560', // Your Account SID
-  'f18a47846d2ff9051a56f551b3d6da4a'   // Your Auth Token
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
 );
 
 const twilioPhoneNumber = '+12183097166';
